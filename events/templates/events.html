@@ -2,7 +2,13 @@
 {% block title %} <title>Upcoming Events</title>{% endblock %}
 
 {% block content %}
-  <div style="margin-left: 2cm; margin-top: 5cm;"> 
+<div style="margin-left:900px; margin-top: 2cm;">
+    <form action="{% url 'events-list' %}" method="GET">
+        <input type="text" name='q' placeholder="Search here...">
+        <input type="submit" value="Search">
+    </form>
+</div>
+  <div style="margin-left: 2cm; margin-top: 1cm;"> 
 {% for event in events %}
     {{event.name}} : {{event.start}}<br>
     <a href="{% url 'event-detail' event.id %}" class="card-link">View</a>

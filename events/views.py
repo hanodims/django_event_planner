@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.views import View
@@ -77,9 +78,9 @@ def Dashboard(request):
     lasts = Booking.objects.filter(customer=request.user,event__end__lt=datetime.today())
     now = Booking.objects.filter(customer=request.user,event__start__lt=datetime.today(),event__end__gte=datetime.today())
     future = Booking.objects.filter(customer=request.user,event__start__gte=datetime.today())
-
+    events = Event.objects.filter(organizer=request.user)
     context = {
-        "events": Event.objects.filter(organizer=request.user),
+        "events": events,
         "last": lasts,
         "now": now,
         "future": future,
@@ -87,16 +88,26 @@ def Dashboard(request):
     return render(request, 'dashboard.html', context)
 
 def UpcomingEvents(request):
+    events = Event.objects.filter(start__gte=datetime.today())
+    query = request.GET.get("q")
+    if query:
+        events = events.filter(
+            Q(name__icontains=query)|
+            Q(description__icontains=query)|
+            Q(organizer__username__icontains=query)
+            ).distinct()
     
     context = {
-        "events": Event.objects.filter(start__gte=datetime.today()),
+        "events": events,
     }
     return render(request, 'events.html', context)
 
 
 def EventDetail(request,event_id):
+    event_obj = Event.objects.get(id=event_id)
     context = {
-        "event": Event.objects.get(id=event_id),
+        "event": event_obj,
+        "users": Booking.objects.filter(event=event_obj),
     }
     return render(request, 'detail.html', context)
 

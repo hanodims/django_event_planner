@@ -8,14 +8,26 @@
     End: {{event.end}}<br>
     Description: {{event.description}}<br>
     Location: {{event.location}}<br>
-    Limit: {{event.limit}}<br>
-    {% if request.user == event.organizer %}
-        <a href="{% url 'event-update' event.id %}" class="card-link">Edit</a>
-        {% if event.limit > 0 %}
-        <a href="{% url 'event-booking' event.id %}" class="card-link">Attend</a>
-        {% else %}
-        <a href="{% url 'event-detail' event.id %}" class="card-link">Full</a>
-        {% endif %}
+    Tickets: {{event.limit}}<br>
+    {% if event.limit > 0 %}
+    <a href="{% url 'event-booking' event.id %}" class="card-link">Attend</a>
+    {% else %}
+    <a href="{% url 'event-detail' event.id %}" class="card-link">Full</a>
     {% endif %}
+    {% if request.user == event.organizer %}
+    <a href="{% url 'event-update' event.id %}" class="card-link">Edit</a>
+    <div><br>
+        <p>Customer:</p>
+        {% for user in users %}
+            {{user.customer}}
+        {% endfor %} </div>
+    {% endif %}
+   
     </div>
     {% endblock %}
+
+
+    <p>Customers:</p>
+    {% for user in users %}
+      {{user.customer}}  
+    {% endfor %}
