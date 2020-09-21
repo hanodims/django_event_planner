@@ -1,7 +1,17 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from django.views import View
-from .forms import UserSignup, UserLogin
+from .forms import UserSignup, UserLogin, EventForm,BookingForm
+from .models import Event,Booking
+from datetime import datetime
+
+def NoAccess(request):
+    context = {
+        "msg": 'you have no access!',
+    }
+    return render(request, 'noaccess.html', context)
+
 
 def home(request):
     return render(request, 'home.html')
@@ -37,7 +47,7 @@ class Login(View):
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
-        if form.is_valid():
+        if form.is_valid(): 
 
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
@@ -46,7 +56,10 @@ class Login(View):
             if auth_user is not None:
                 login(request, auth_user)
                 messages.success(request, "Welcome Back!")
-                return redirect('dashboard')
+                if request.user.is_staff:
+                    return redirect('dashboard') 
+                else:
+                    return redirect('dashboard') 
             messages.warning(request, "Wrong email/password combination. Please try again.")
             return redirect("login")
         messages.warning(request, form.errors)
@@ -59,3 +72,101 @@ class Logout(View):
         messages.success(request, "You have successfully logged out.")
         return redirect("login")
 
+
+def Dashboard(request): 
+    lasts = Booking.objects.filter(customer=request.user,event__end__lt=datetime.today())
+    now = Booking.objects.filter(customer=request.user,event__start__lt=datetime.today(),event__end__gte=datetime.today())
+    future = Booking.objects.filter(customer=request.user,event__start__gte=datetime.today())
+
+    context = {
+        "events": Event.objects.filter(organizer=request.user),
+        "last": lasts,
+        "now": now,
+        "future": future,
+    }
+    return render(request, 'dashboard.html', context)
+
+def UpcomingEvents(request):
+    
+    context = {
+        "events": Event.objects.filter(start__gte=datetime.today()),
+    }
+    return render(request, 'events.html', context)
+
+
+def EventDetail(request,event_id):
+    context = {
+        "event": Event.objects.get(id=event_id),
+    }
+    return render(request, 'detail.html', context)
+
+
+def EventCreate(request):
+    if not request.user.is_authenticated:
+        return redirect('no-access')
+    form = EventForm()
+    if request.method == "POST":
+        form = EventForm(request.POST)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.organizer = request.user
+            event.save()
+            messages.success(request, "Successfull!")
+            return redirect('dashboard')
+    context = {
+        "form":form,
+    }
+    return render(request, 'create.html', context)
+
+
+def EventUpdate(request,event_id):
+    event = Event.objects.get(id=event_id)
+    if not request.user.is_authenticated and request.user != event.organizer:
+        return redirect('no-access')
+    form = EventForm(instance=event)
+    if request.method == "POST":
+        form = EventForm(request.POST, instance=event)
+        if form.is_valid():
+            form.save()
+            return redirect("event-detail",event_id=event_id)
+            messages.success(request, "Successfull!")
+    context = {
+        "event":event,
+        "form": form,
+    }
+    return render(request, 'update.html', context)
+
+def EventBooking(request,event_id):
+    event_obj = Event.objects.get(id=event_id)
+    if not request.user.is_authenticated or event_obj.limit == 0:
+        return redirect('no-access')
+    form = BookingForm()
+    if request.method == "POST":
+        form = BookingForm(request.POST)
+        if form.is_valid():
+            book = form.save(commit=False)
+            if book.tickets > event_obj.limit:
+                messages.warning(request, f"just {event_obj.limit} left!")
+                return redirect('event-booking',event_id=event_id)
+            elif book.tickets <= 0:
+                messages.warning(request, f"Enter correct number, {event_obj.limit} left!")
+                return redirect('event-booking',event_id=event_id)
+            book.customer = request.user
+            book.event = event_obj
+            if Booking.objects.filter(customer=book.customer,event=book.event):
+                messages.success(request, "You are in already!")
+                return redirect('dashboard')
+            event_obj.limit -= book.tickets
+            event_obj.save()
+            book.save()
+            messages.success(request, "Successfull!")
+            return redirect('dashboard')
+
+
+    context = {
+        "event":event_obj,
+        "form":form 
+    }
+    return render(request,'booking.html', context)
+
+ 

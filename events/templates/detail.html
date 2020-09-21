@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %} <title>Event Detail</title>{% endblock %}
+
+{% block content %}
+<div style="margin-left: 2cm; margin-top: 4cm;">
+    Name : {{event.name}}<br>
+    Start: {{event.start}}<br> 
+    End: {{event.end}}<br>
+    Description: {{event.description}}<br>
+    Location: {{event.location}}<br>
+    Limit: {{event.limit}}<br>
+    {% if request.user == event.organizer %}
+        <a href="{% url 'event-update' event.id %}" class="card-link">Edit</a>
+        {% if event.limit > 0 %}
+        <a href="{% url 'event-booking' event.id %}" class="card-link">Attend</a>
+        {% else %}
+        <a href="{% url 'event-detail' event.id %}" class="card-link">Full</a>
+        {% endif %}
+    {% endif %}
+    </div>
+    {% endblock %}

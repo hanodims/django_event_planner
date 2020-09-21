@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %} <title>Dasboard</title>{% endblock %}
+
+{% block content %}
+  <a href="{%url 'create-event' %}" class="btn btn-primary btn-xl rounded-pill" style="margin-left:900px; margin-top: 2cm;">Create Event!</a>
+  <div style="margin-left: 2cm;"> {% for event in events %}
+  {{event.name}} : {{event.start}}
+  <a href="{% url 'event-detail' event.id %}" class="card-link">View</a><br>
+  {% endfor %}
+  </div>
+  <div style="margin-left: 2cm; margin-top: 1cm;">
+    Future Events:
+    {% for event_obj in future %}
+    <br>
+    {{event_obj.event.name}}
+    {% endfor %}
+  </div>
+  <div style="margin-left: 2cm; margin-top: 1cm;">
+    Current Events:
+    {% for event_obj in now %}
+    <br>
+    {{event_obj.event.name}}
+    {% endfor %}
+  </div>
+  <div style="margin-left: 2cm; margin-top: 1cm;">
+    last Events:
+    {% for event_obj in last %}
+    <br>
+    {{event_obj.event.name}}
+    {% endfor %}
+  </div>
+  {% endblock %}

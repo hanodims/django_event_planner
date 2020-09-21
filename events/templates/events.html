@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %} <title>Upcoming Events</title>{% endblock %}
+
+{% block content %}
+  <div style="margin-left: 2cm; margin-top: 5cm;"> 
+{% for event in events %}
+    {{event.name}} : {{event.start}}<br>
+    <a href="{% url 'event-detail' event.id %}" class="card-link">View</a>
+    {% if event.limit > 0 %}
+    <a href="{% url 'event-booking' event.id %}" class="card-link">Attend</a><br> 
+    {% else %}
+    <a href="{% url 'events-list' %}" class="card-link">Full</a><br> 
+    {% endif %}
+    {% endfor %}
+    </div>
+  {% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block title %} <title>Update Event</title>{% endblock %}
+
+{% block content %}
+{% if request.user == event.organizer %}
+    <form action="{% url 'event-update' event_id=event.id%}" method="POST">
+        <div class="jumbotron">
+            <h2 class="display-2">Edit Your Event!</h2>
+            <p class="lead">      
+                {% csrf_token %}
+                {{form|crispy}}</p>
+            <hr class="my-2">
+            <input class="btn btn-primary btn-lg" type="submit" value="Done">
+        
+            </div>
+    </form>
+    {% endif %}
+  {% endblock %}
