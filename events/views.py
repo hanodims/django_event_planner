@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.views import View
 from .forms import UserSignup, UserLogin, EventForm,BookingForm
 from .models import Event,Booking
-from datetime import datetime
+from datetime import datetime, date
 
 def NoAccess(request):
     context = {
@@ -149,7 +149,7 @@ def EventUpdate(request,event_id):
 
 def EventBooking(request,event_id):
     event_obj = Event.objects.get(id=event_id)
-    if not request.user.is_authenticated or event_obj.limit == 0:
+    if not request.user.is_authenticated or event_obj.limit == 0 or event_obj.start < date.today() or event_obj.end < date.today():
         return redirect('no-access')
     form = BookingForm()
     if request.method == "POST":
@@ -180,4 +180,18 @@ def EventBooking(request,event_id):
     }
     return render(request,'booking.html', context)
 
+
+def BookCancel(request,book_id):
+
+    context = {
+    
+    }
+    return render(request, 'book-cancel', context)
+
+
+def Profile(request):
+    context = {
+        "msg": 'hi!',
+    }
+    return render(request, 'profile.html', context)
  

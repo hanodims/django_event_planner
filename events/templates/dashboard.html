@@ -14,6 +14,7 @@
     {% for event_obj in future %}
     <br>
     {{event_obj.event.name}}
+    <a href="{% url 'event-detail' event_obj.event.id %}" class="card-link">View</a>
     {% endfor %}
   </div>
   <div style="margin-left: 2cm; margin-top: 1cm;">
@@ -21,6 +22,7 @@
     {% for event_obj in now %}
     <br>
     {{event_obj.event.name}}
+    <a href="{% url 'event-detail' event_obj.event.id %}" class="card-link">View</a>
     {% endfor %}
   </div>
   <div style="margin-left: 2cm; margin-top: 1cm;">
@@ -28,6 +30,7 @@
     {% for event_obj in last %}
     <br>
     {{event_obj.event.name}}
+    <a href="{% url 'event-detail' event_obj.event.id %}" class="card-link">View</a>
     {% endfor %}
   </div>
   {% endblock %}
