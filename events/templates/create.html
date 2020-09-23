@@ -3,7 +3,7 @@
 {% block title %} <title>Create Event</title>{% endblock %}
 
 {% block content %}
-<form action="{% url 'create-event' %}" method="POST">
+<form action="{% url 'create-event' %}" method="POST" enctype="multipart/form-data">
     <div class="jumbotron">
         <h2 class="display-2">Create Event!</h2>
         <p class="lead">      

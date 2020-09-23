@@ -7,8 +7,8 @@ admin.site.site_title = "dashboard"
 admin.site.index_title = "Organizer Dashboard"
 
 class EventAdmin(admin.ModelAdmin):
-    fields = ['name', 'location','start','end','limit','organizer']
-    list_display = ['name', 'location','start','end','limit']
+    fields = ['name', 'location','start','end','limit','organizer','img']
+    list_display = ['name', 'location','start','end','limit','img']
     list_filter = ['organizer']
     search_fields = ['name', 'location','start','end','limit']
     list_editable = ['limit']

@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.views import View
 from .forms import UserSignup, UserLogin, EventForm,BookingForm
 from .models import Event,Booking
-from datetime import datetime, date
+from django.utils.timezone import now
 
 def NoAccess(request):
     context = {
@@ -75,20 +75,20 @@ class Logout(View):
 
 
 def Dashboard(request): 
-    lasts = Booking.objects.filter(customer=request.user,event__end__lt=datetime.today())
-    now = Booking.objects.filter(customer=request.user,event__start__lt=datetime.today(),event__end__gte=datetime.today())
-    future = Booking.objects.filter(customer=request.user,event__start__gte=datetime.today())
+    lasts = Booking.objects.filter(customer=request.user,event__end__lt=now())
+    currents = Booking.objects.filter(customer=request.user,event__start__lt=now(),event__end__gte=now())
+    future = Booking.objects.filter(customer=request.user,event__start__gte=now())
     events = Event.objects.filter(organizer=request.user)
     context = {
         "events": events,
         "last": lasts,
-        "now": now,
+        "currents": currents,
         "future": future,
     }
     return render(request, 'dashboard.html', context)
 
 def UpcomingEvents(request):
-    events = Event.objects.filter(start__gte=datetime.today())
+    events = Event.objects.filter(start__gte=now())
     query = request.GET.get("q")
     if query:
         events = events.filter(
@@ -117,7 +117,7 @@ def EventCreate(request):
         return redirect('no-access')
     form = EventForm()
     if request.method == "POST":
-        form = EventForm(request.POST)
+        form = EventForm(request.POST,request.FILES)
         if form.is_valid():
             event = form.save(commit=False)
             event.organizer = request.user
@@ -136,7 +136,7 @@ def EventUpdate(request,event_id):
         return redirect('no-access')
     form = EventForm(instance=event)
     if request.method == "POST":
-        form = EventForm(request.POST, instance=event)
+        form = EventForm(request.POST, request.FILES,instance=event)
         if form.is_valid():
             form.save()
             return redirect("event-detail",event_id=event_id)
@@ -149,7 +149,7 @@ def EventUpdate(request,event_id):
 
 def EventBooking(request,event_id):
     event_obj = Event.objects.get(id=event_id)
-    if not request.user.is_authenticated or event_obj.limit == 0 or event_obj.start < date.today() or event_obj.end < date.today():
+    if not request.user.is_authenticated or event_obj.limit == 0 or event_obj.limit == 0 or event_obj.start < now() or event_obj.end < now():
         return redirect('no-access')
     form = BookingForm()
     if request.method == "POST":

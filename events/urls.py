@@ -1,8 +1,12 @@
-from django.urls import path
+from django.urls import path,include
 from django.contrib import admin
 from events import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
+
+    path('api/',include('api.urls')),
 
 	path('', views.home, name='home'),
 	path('noaccess/', views.NoAccess, name='no-access'),
@@ -24,3 +28,4 @@ urlpatterns = [
     path('logout/', views.Logout.as_view(), name='logout'),
 ]
 
+urlpatterns+=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
