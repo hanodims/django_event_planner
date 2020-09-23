@@ -26,4 +26,4 @@ class EventForm(forms.ModelForm):
 class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
-        exclude = ['customer','event']
+        fields = ['tickets']

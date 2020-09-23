@@ -181,12 +181,14 @@ def EventBooking(request,event_id):
     return render(request,'booking.html', context)
 
 
-def BookCancel(request,book_id):
-
-    context = {
-    
-    }
-    return render(request, 'book-cancel', context)
+def BookCancel(request,book_id):#add 3 hours condition
+    booking = Booking.objects.get(id=book_id)
+    event =  Event.objects.get(id=booking.event.id)
+    event.limit += booking.tickets
+    event.save()
+    booking.delete()
+  
+    return redirect('dashboard')
 
 
 def Profile(request):

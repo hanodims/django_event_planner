@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %} <title>Dasboard</title>{% endblock %}
-
 {% block content %}
+<!---Organizer-->
   <a href="{%url 'create-event' %}" class="btn btn-primary btn-xl rounded-pill" style="margin-left:900px; margin-top: 2cm;">Create Event!</a>
   <div style="margin-left: 2cm;"> 
   {% for event in events %}
@@ -9,12 +9,15 @@
   <a href="{% url 'event-detail' event.id %}" class="card-link">View</a><br>
   {% endfor %}
   </div>
+   <!---End-Organizer-->
+
   <div style="margin-left: 2cm; margin-top: 1cm;">
     Future Events:
     {% for event_obj in future %}
     <br>
     {{event_obj.event.name}}
     <a href="{% url 'event-detail' event_obj.event.id %}" class="card-link">View</a>
+    <a href="{% url 'book-cancel' event_obj.id %}" class="card-link">Cancel</a>
     {% endfor %}
   </div>
   <div style="margin-left: 2cm; margin-top: 1cm;">

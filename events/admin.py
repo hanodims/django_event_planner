@@ -16,8 +16,8 @@ class EventAdmin(admin.ModelAdmin):
 
 
 class BookingAdmin(admin.ModelAdmin):
-    fields = ['customer', 'event']
-    list_display = ['customer', 'event']
+    fields = ['customer', 'event','tickets']
+    list_display = ['customer', 'event','tickets','time']
     list_filter = ['event']
     search_fields = ['customer', 'event']
     list_display_links = ['customer']

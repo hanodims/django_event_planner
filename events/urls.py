@@ -12,10 +12,12 @@ urlpatterns = [
 
     path('dashboard/create/', views.EventCreate, name='create-event'),
     path('dashboard/<int:event_id>/update', views.EventUpdate, name='event-update'),
+    
 
 	path('events/', views.UpcomingEvents, name='events-list'),
 	path('dashboard/<int:event_id>/', views.EventDetail, name='event-detail'),
 	path('dashboard/<int:event_id>/book', views.EventBooking, name='event-booking'),
+    path('dashboard/<int:book_id>/cancel', views.BookCancel, name='book-cancel'),
    
     path('signup/', views.Signup.as_view(), name='signup'),
     path('login/', views.Login.as_view(), name='login'),
