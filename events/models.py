@@ -18,7 +18,7 @@ class Event(models.Model):
 
 class Booking(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="bookings")
     tickets = models.IntegerField()
     time = models.DateTimeField(default=now,blank=True)
 

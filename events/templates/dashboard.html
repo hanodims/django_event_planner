@@ -22,7 +22,7 @@
   </div>
   <div style="margin-left: 2cm; margin-top: 1cm;">
     Current Events:
-    {% for event_obj in now %}
+    {% for event_obj in currents %}
     <br>
     {{event_obj.event.name}}
     <a href="{% url 'event-detail' event_obj.event.id %}" class="card-link">View</a>

@@ -73,22 +73,29 @@ class Logout(View):
         messages.success(request, "You have successfully logged out.")
         return redirect("login")
 
-
+#As an event organizer I have a dashboard,and see it when login
 def Dashboard(request): 
+    #As a user I can track previous events I have went to.
     lasts = Booking.objects.filter(customer=request.user,event__end__lt=now())
-    currents = Booking.objects.filter(customer=request.user,event__start__lt=now(),event__end__gte=now())
+    currents = Booking.objects.filter(customer=request.user,event__start__lte=now(),event__end__gte=now())
     future = Booking.objects.filter(customer=request.user,event__start__gte=now())
+    #As an event organizer I have a list of the events that I created in my dashboard
     events = Event.objects.filter(organizer=request.user)
     context = {
         "events": events,
         "last": lasts,
         "currents": currents,
         "future": future,
+        'current_date' : now()
     }
     return render(request, 'dashboard.html', context)
 
+
+ #As a user I can see a list of upcoming events when I log in.
+ #user not able to see passed.
 def UpcomingEvents(request):
     events = Event.objects.filter(start__gte=now())
+    #As a user I can search for an event either by it's title, description or organiz
     query = request.GET.get("q")
     if query:
         events = events.filter(
@@ -102,16 +109,18 @@ def UpcomingEvents(request):
     }
     return render(request, 'events.html', context)
 
-
+#As a user I can see the full details of the event
 def EventDetail(request,event_id):
     event_obj = Event.objects.get(id=event_id)
     context = {
         "event": event_obj,
+        #As an event organizer I can track the users who booked for my events in my event detail view.
         "users": Booking.objects.filter(event=event_obj),
     }
     return render(request, 'detail.html', context)
 
 
+#As an Event organizer I can create an Event in my dashboard
 def EventCreate(request):
     if not request.user.is_authenticated:
         return redirect('no-access')
@@ -147,6 +156,7 @@ def EventUpdate(request,event_id):
     }
     return render(request, 'update.html', context)
 
+#As a user I can book for an eve
 def EventBooking(request,event_id):
     event_obj = Event.objects.get(id=event_id)
     if not request.user.is_authenticated or event_obj.limit == 0 or event_obj.limit == 0 or event_obj.start < now() or event_obj.end < now():
@@ -156,6 +166,7 @@ def EventBooking(request,event_id):
         form = BookingForm(request.POST)
         if form.is_valid():
             book = form.save(commit=False)
+            #As a user If an event is full, I will not be able to book.
             if book.tickets > event_obj.limit:
                 messages.warning(request, f"just {event_obj.limit} left!")
                 return redirect('event-booking',event_id=event_id)
@@ -180,10 +191,12 @@ def EventBooking(request,event_id):
     }
     return render(request,'booking.html', context)
 
-
-def BookCancel(request,book_id):#add 3 hours condition
+#As a user I can cancel a booking #(Not Working)for an event only 3 hours before the event.
+def BookCancel(request,book_id):
     booking = Booking.objects.get(id=book_id)
     event =  Event.objects.get(id=booking.event.id)
+    """ if event.start.hour - now.hour < 3:
+        redirect('dashboard')"""
     event.limit += booking.tickets
     event.save()
     booking.delete()
